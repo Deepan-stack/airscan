@@ -1,0 +1,345 @@
+/* ==========================================================
+   AEROLUX AIRCRAFT SEAT MAP & CABIN SELECTOR
+   ========================================================== */
+
+.booking-layout {
+  display: grid;
+  grid-template-columns: 1.8fr 1.2fr;
+  gap: 2rem;
+  margin: 2.5rem 0;
+  align-items: start;
+}
+
+/* Airplane Fuselage Shell */
+.airplane-wrapper {
+  background: rgba(11, 17, 31, 0.95);
+  border: 1px solid var(--border-glass);
+  border-radius: 40px;
+  padding: 3rem 2rem;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 210, 255, 0.05);
+  overflow: hidden;
+}
+
+/* Nose Cockpit cone */
+.cockpit-cone {
+  width: 180px;
+  height: 90px;
+  margin: 0 auto 2.5rem;
+  border: 2px solid var(--border-gold);
+  border-bottom: none;
+  border-radius: 90px 90px 0 0;
+  background: linear-gradient(180deg, rgba(229, 184, 105, 0.15) 0%, rgba(14, 22, 40, 0.8) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.cockpit-cone::before {
+  content: '⚡ FLIGHT DECK';
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
+
+.cockpit-windows {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.cockpit-window {
+  width: 22px;
+  height: 12px;
+  background: rgba(0, 210, 255, 0.4);
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 210, 255, 0.6);
+}
+
+/* Cabin Section Dividers */
+.cabin-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0 1.2rem;
+  position: relative;
+}
+
+.cabin-divider::before, .cabin-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+}
+
+.cabin-badge {
+  padding: 0.3rem 0.9rem;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cabin-badge.first {
+  background: rgba(229, 184, 105, 0.15);
+  border: 1px solid var(--gold-primary);
+  color: var(--gold-primary);
+  box-shadow: 0 0 15px rgba(229, 184, 105, 0.2);
+}
+
+.cabin-badge.business {
+  background: rgba(0, 210, 255, 0.15);
+  border: 1px solid var(--cyan-primary);
+  color: var(--cyan-primary);
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+}
+
+.cabin-badge.economy {
+  background: rgba(148, 163, 184, 0.15);
+  border: 1px solid var(--text-muted);
+  color: #cbd5e1;
+}
+
+/* Seat Grid Container */
+.seat-rows-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.row-number {
+  width: 28px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.aisle-gap {
+  width: 24px;
+  height: 100%;
+}
+
+.aisle-gap.wide {
+  width: 38px;
+}
+
+/* Individual Seat Styling */
+.seat-btn {
+  width: 42px;
+  height: 44px;
+  background: rgba(18, 28, 48, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px 8px 5px 5px;
+  color: #e2e8f0;
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  outline: none;
+}
+
+/* Armrest cues */
+.seat-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  width: 70%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+/* First Class Suites */
+.seat-btn.seat-first {
+  width: 52px;
+  height: 52px;
+  border-color: rgba(229, 184, 105, 0.4);
+  background: linear-gradient(135deg, rgba(229, 184, 105, 0.12), rgba(18, 28, 48, 0.95));
+}
+
+.seat-btn.seat-first:hover:not(.occupied) {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 15px rgba(229, 184, 105, 0.5);
+  transform: scale(1.08);
+}
+
+/* Business Class */
+.seat-btn.seat-biz {
+  width: 46px;
+  height: 48px;
+  border-color: rgba(0, 210, 255, 0.35);
+  background: linear-gradient(135deg, rgba(0, 210, 255, 0.08), rgba(18, 28, 48, 0.95));
+}
+
+.seat-btn.seat-biz:hover:not(.occupied) {
+  border-color: var(--cyan-primary);
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+  transform: scale(1.08);
+}
+
+/* Economy Seat */
+.seat-btn.seat-eco:hover:not(.occupied) {
+  border-color: #fff;
+  background: rgba(30, 41, 59, 1);
+  transform: scale(1.08);
+}
+
+/* Extra Legroom tag */
+.seat-btn.extra-legroom::before {
+  content: '★';
+  position: absolute;
+  top: 1px;
+  right: 3px;
+  font-size: 0.55rem;
+  color: var(--gold-primary);
+}
+
+/* Occupied Seat */
+.seat-btn.occupied {
+  background: rgba(15, 20, 32, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.15) !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.seat-btn.occupied::after {
+  content: '✕';
+  position: absolute;
+  font-size: 0.8rem;
+  color: rgba(239, 68, 68, 0.4);
+}
+
+/* Selected Seat */
+.seat-btn.selected {
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)) !important;
+  border-color: #fff !important;
+  color: #070a12 !important;
+  box-shadow: 0 0 20px rgba(229, 184, 105, 0.8) !important;
+  transform: translateY(-2px) scale(1.1) !important;
+  z-index: 5;
+}
+
+/* Seat Legend */
+.seat-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.legend-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.legend-box.available {
+  background: rgba(18, 28, 48, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.legend-box.occupied {
+  background: rgba(15, 20, 32, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.legend-box.selected {
+  background: var(--gold-primary);
+  box-shadow: 0 0 8px var(--gold-primary);
+}
+
+.legend-box.legroom {
+  background: rgba(229, 184, 105, 0.2);
+  border: 1px solid var(--gold-primary);
+}
+
+/* Checkout Summary Sidebar */
+.checkout-panel {
+  position: sticky;
+  top: 90px;
+}
+
+.fare-breakdown {
+  margin: 1.2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+}
+
+.fare-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.fare-row.total {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.8rem;
+  margin-top: 0.5rem;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.fare-row.total .price {
+  color: var(--gold-primary);
+  font-size: 1.4rem;
+  font-family: var(--font-heading);
+}
+
+/* Promo Code Box */
+.promo-box {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.promo-input {
+  flex: 1;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+}

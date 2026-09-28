@@ -1,0 +1,245 @@
+/* ==========================================================
+   AEROLUX LUXURY BOARDING PASS & TICKET STYLING
+   ========================================================== */
+
+.boarding-pass-card {
+  max-width: 820px;
+  margin: 2rem auto;
+  background: #0f172a;
+  border-radius: 24px;
+  border: 1px solid var(--border-gold);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(229, 184, 105, 0.15);
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gold Header Strip */
+.boarding-pass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, var(--gold-primary), var(--cyan-primary), var(--gold-primary));
+}
+
+/* Main Boarding Pass Section */
+.pass-main {
+  flex: 2.3;
+  padding: 2.2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Perforated Stub Line with Cutout Notches */
+.pass-stub {
+  flex: 1;
+  padding: 2.2rem 1.8rem;
+  background: rgba(10, 15, 28, 0.95);
+  border-left: 2px dashed rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Semi-circular notch cutouts */
+.pass-stub::before, .pass-stub::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  width: 24px;
+  height: 24px;
+  background: var(--bg-dark);
+  border-radius: 50%;
+  border: 1px solid var(--border-glass);
+}
+
+.pass-stub::before {
+  top: -12px;
+}
+
+.pass-stub::after {
+  bottom: -12px;
+}
+
+.pass-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.pass-brand .title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+.pass-brand .class-tag {
+  background: rgba(229, 184, 105, 0.2);
+  border: 1px solid var(--gold-primary);
+  color: var(--gold-primary);
+  padding: 0.2rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pass-route {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pass-airport h2 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+
+.pass-airport p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.pass-flight-flight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.pass-flight-flight .plane-icon {
+  font-size: 1.3rem;
+  color: var(--gold-primary);
+  animation: floatPlane 3s ease-in-out infinite;
+}
+
+@keyframes floatPlane {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.pass-details-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 1.8rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.detail-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.detail-value {
+  font-size: 1.15rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: #fff;
+}
+
+.detail-value.highlight {
+  color: var(--gold-primary);
+}
+
+/* Barcode & QR Code presentation */
+.pass-barcode-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.barcode-simulated {
+  height: 48px;
+  width: 240px;
+  background: repeating-linear-gradient(
+    90deg,
+    #fff,
+    #fff 2px,
+    transparent 2px,
+    transparent 4px,
+    #fff 4px,
+    #fff 7px,
+    transparent 7px,
+    transparent 9px,
+    #fff 9px,
+    #fff 13px,
+    transparent 13px,
+    transparent 15px
+  );
+  border-radius: 4px;
+}
+
+.qr-code-box {
+  width: 90px;
+  height: 90px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-code-box svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Print Sheet Styling */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .navbar, .footer, .btn, .no-print {
+    display: none !important;
+  }
+  .boarding-pass-card {
+    border: 2px solid #000 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .boarding-pass-card * {
+    color: #000 !important;
+  }
+  .pass-stub {
+    border-left: 2px dashed #000 !important;
+    background: #f8fafc !important;
+  }
+  .barcode-simulated {
+    background: repeating-linear-gradient(
+      90deg,
+      #000,
+      #000 2px,
+      transparent 2px,
+      transparent 4px,
+      #000 4px,
+      #000 7px
+    ) !important;
+  }
+}

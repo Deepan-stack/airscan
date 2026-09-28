@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+
+{% block title %}Select Seats & Book Flight {{ flight.flight_number }} — AirScan{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 1.5rem 4rem;">
+
+  <!-- Flight Header Information Card -->
+  <div class="card-glass" style="margin-bottom: 2rem; border-color: var(--border-gold);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+      <div style="display: flex; align-items: center; gap: 1.5rem;">
+        <div class="airline-logo-box" style="width: 56px; height: 56px; font-size: 1.6rem;">
+          <i class="fa-solid fa-plane-departure"></i>
+        </div>
+        <div>
+          <div style="display: flex; gap: 0.6rem; align-items: center;">
+            <span class="badge badge-gold">{{ flight.airline_name }}</span>
+            <span class="badge badge-cyan">{{ flight.flight_number }}</span>
+            <span class="badge badge-gold">{{ cabin_class }} Class</span>
+            <span style="color: var(--text-muted); font-size: 0.85rem;">{{ flight.aircraft_model }}</span>
+          </div>
+          <h2 style="font-size: 1.6rem; margin-top: 0.3rem;">
+            {{ flight.origin_city }} ({{ flight.origin_code }}) <i class="fa-solid fa-arrow-right" style="color: var(--gold-primary); font-size: 1rem; margin: 0 0.5rem;"></i> {{ flight.destination_city }} ({{ flight.destination_code }})
+          </h2>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 2rem; align-items: center;">
+        <div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Departure</div>
+          <div style="font-size: 1.1rem; font-weight: 700; color: #fff;">{{ flight.departure_time }}</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">Terminal {{ flight.terminal }} • Gate {{ flight.gate }}</div>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Duration</div>
+          <div style="font-size: 1.1rem; font-weight: 700; color: var(--cyan-primary);">{{ flight.duration_formatted }}</div>
+          <div style="font-size: 0.75rem; color: var(--success);">Direct Flight</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Booking Layout: Fuselage Seat Selector on Left, Passenger Forms & Checkout on Right -->
+  <div class="booking-layout">
+
+    <!-- Interactive Fuselage Seat Map -->
+    <div class="airplane-wrapper">
+      <!-- Cockpit Nose Cone -->
+      <div class="cockpit-cone">
+        <span>AIRSCAN CABIN</span>
+        <div class="cockpit-windows">
+          <div class="cockpit-window"></div>
+          <div class="cockpit-window"></div>
+          <div class="cockpit-window"></div>
+          <div class="cockpit-window"></div>
+        </div>
+      </div>
+
+      <!-- First Class Section -->
+      <div class="cabin-divider">
+        <span class="cabin-badge first"><i class="fa-solid fa-crown"></i> First Class Suites (Rows 1-2)</span>
+      </div>
+
+      <div class="seat-rows-container">
+        {% for r in [1, 2] %}
+          <div class="seat-row">
+            <span class="row-number">{{ r }}</span>
+            <!-- Seat A -->
+            {% set seat_a = seats|selectattr('seat_number', 'equalto', r ~ 'A')|first %}
+            <button type="button" 
+                    class="seat-btn seat-first {% if seat_a and seat_a.is_occupied %}occupied{% endif %}"
+                    data-seat-id="{{ seat_a.id if seat_a else '' }}"
+                    data-seat-num="{{ r }}A"
+                    data-seat-class="First"
+                    data-modifier="{{ seat_a.price_modifier if seat_a else 0 }}"
+                    {% if seat_a and seat_a.is_occupied %}disabled title="Occupied"{% else %}title="Seat {{ r }}A • First Class Private Suite (+₹{{ seat_a.price_modifier|int if seat_a else 0 }})"{% endif %}>
+              {{ r }}A
+            </button>
+
+            <div class="aisle-gap wide"></div>
+
+            <!-- Seat D -->
+            {% set seat_d = seats|selectattr('seat_number', 'equalto', r ~ 'D')|first %}
+            <button type="button" 
+                    class="seat-btn seat-first {% if seat_d and seat_d.is_occupied %}occupied{% endif %}"
+                    data-seat-id="{{ seat_d.id if seat_d else '' }}"
+                    data-seat-num="{{ r }}D"
+                    data-seat-class="First"
+                    data-modifier="{{ seat_d.price_modifier if seat_d else 0 }}"
+                    {% if seat_d and seat_d.is_occupied %}disabled title="Occupied"{% else %}title="Seat {{ r }}D • First Class Private Suite (+₹{{ seat_d.price_modifier|int if seat_d else 0 }})"{% endif %}>
+              {{ r }}D
+            </button>
+
+            <div class="aisle-gap wide"></div>
+
+            <!-- Seat F -->
+            {% set seat_f = seats|selectattr('seat_number', 'equalto', r ~ 'F')|first %}
+            <button type="button" 
+                    class="seat-btn seat-first {% if seat_f and seat_f.is_occupied %}occupied{% endif %}"
+                    data-seat-id="{{ seat_f.id if seat_f else '' }}"
+                    data-seat-num="{{ r }}F"
+                    data-seat-class="First"
+                    data-modifier="{{ seat_f.price_modifier if seat_f else 0 }}"
+                    {% if seat_f and seat_f.is_occupied %}disabled title="Occupied"{% else %}title="Seat {{ r }}F • First Class Private Suite (+₹{{ seat_f.price_modifier|int if seat_f else 0 }})"{% endif %}>
+              {{ r }}F
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Business Class Section -->
+      <div class="cabin-divider">
+        <span class="cabin-badge business"><i class="fa-solid fa-gem"></i> Business Class Lie-Flat (Rows 3-6)</span>
+      </div>
+
+      <div class="seat-rows-container">
+        {% for r in range(3, 7) %}
+          <div class="seat-row">
+            <span class="row-number">{{ r }}</span>
+            <!-- A, B -->
+            {% for c in ['A', 'B'] %}
+              {% set s_item = seats|selectattr('seat_number', 'equalto', r ~ c)|first %}
+              <button type="button" 
+                      class="seat-btn seat-biz {% if s_item and s_item.is_occupied %}occupied{% endif %}"
+                      data-seat-id="{{ s_item.id if s_item else '' }}"
+                      data-seat-num="{{ r }}{{ c }}"
+                      data-seat-class="Business"
+                      data-modifier="{{ s_item.price_modifier if s_item else 0 }}"
+                      {% if s_item and s_item.is_occupied %}disabled title="Occupied"{% else %}title="Seat {{ r }}{{ c }} • Business Pod"{% endif %}>
+                {{ r }}{{ c }}
+              </button>
+            {% endfor %}
+
+            <div class="aisle-gap wide"></div>
+
+            <!-- E, F -->
+            {% for c in ['E', 'F'] %}
+              {% set s_item = seats|selectattr('seat_number', 'equalto', r ~ c)|first %}
+              <button type="button" 
+                      class="seat-btn seat-biz {% if s_item and s_item.is_occupied %}occupied{% endif %}"
+                      data-seat-id="{{ s_item.id if s_item else '' }}"
+                      data-seat-num="{{ r }}{{ c }}"
+                      data-seat-class="Business"
+                      data-modifier="{{ s_item.price_modifier if s_item else 0 }}"
+                      {% if s_item and s_item.is_occupied %}disabled title="Occupied"{% else %}title="Seat {{ r }}{{ c }} • Business Pod"{% endif %}>
+                {{ r }}{{ c }}
+              </button>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Economy Class Section -->
+      <div class="cabin-divider">
+        <span class="cabin-badge economy"><i class="fa-solid fa-users"></i> Economy Class (Rows 10-20)</span>
+      </div>
+
+      <div class="seat-rows-container">
+        {% for r in range(10, 21) %}
+          <div class="seat-row">
+            <span class="row-number">{{ r }}</span>
+            <!-- A, B, C -->
+            {% for c in ['A', 'B', 'C'] %}
+              {% set s_item = seats|selectattr('seat_number', 'equalto', r ~ c)|first %}
+              <button type="button" 
+                      class="seat-btn seat-eco {% if s_item and s_item.is_occupied %}occupied{% endif %} {% if s_item and s_item.is_extra_legroom %}extra-legroom{% endif %}"
+                      data-seat-id="{{ s_item.id if s_item else '' }}"
+                      data-seat-num="{{ r }}{{ c }}"
+                      data-seat-class="Economy"
+                      data-modifier="{{ s_item.price_modifier if s_item else 0 }}"
+                      {% if s_item and s_item.is_occupied %}disabled title="Occupied"{% else %}title="Seat {{ r }}{{ c }} • Economy {% if s_item and s_item.is_extra_legroom %}Extra Legroom (+₹{{ s_item.price_modifier|int }}){% endif %}"{% endif %}>
+                {{ r }}{{ c }}
+              </button>
+            {% endfor %}
+
+            <div class="aisle-gap"></div>
+
+            <!-- D, E, F -->
+            {% for c in ['D', 'E', 'F'] %}
+              {% set s_item = seats|selectattr('seat_number', 'equalto', r ~ c)|first %}
+              <button type="button" 
+                      class="seat-btn seat-eco {% if s_item and s_item.is_occupied %}occupied{% endif %} {% if s_item and s_item.is_extra_legroom %}extra-legroom{% endif %}"
+                      data-seat-id="{{ s_item.id if s_item else '' }}"
+                      data-seat-num="{{ r }}{{ c }}"
+                      data-seat-class="Economy"
+                      data-modifier="{{ s_item.price_modifier if s_item else 0 }}"
+                      {% if s_item and s_item.is_occupied %}disabled title="Occupied"{% else %}title="Seat {{ r }}{{ c }} • Economy {% if s_item and s_item.is_extra_legroom %}Extra Legroom (+₹{{ s_item.price_modifier|int }}){% endif %}"{% endif %}>
+                {{ r }}{{ c }}
+              </button>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Seat Map Legend -->
+      <div class="seat-legend">
+        <div class="legend-item">
+          <div class="legend-box available"></div>
+          <span>Available</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-box selected"></div>
+          <span>Your Selection</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-box occupied"></div>
+          <span>Occupied</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-box legroom"></div>
+          <span>★ Extra Legroom</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Passenger Details & Checkout Panel -->
+    <div>
+      <div class="checkout-panel">
+
+        <!-- Passenger Forms -->
+        {% for i in range(passengers_count) %}
+          <div class="card-glass" style="margin-bottom: 1.5rem; padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+              <h4 style="font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-user-tie" style="color: var(--gold-primary);"></i> Passenger {{ i + 1 }}
+              </h4>
+              <div id="passenger-seat-badge-{{ i }}">
+                <span class="badge badge-warning">Select a seat on map</span>
+              </div>
+            </div>
+
+            <!-- Hidden seat inputs for this passenger -->
+            <input type="hidden" id="passenger-seat-id-{{ i }}">
+            <input type="hidden" id="passenger-seat-num-{{ i }}">
+
+            <div class="form-group">
+              <label>Full Name (as on Passport) *</label>
+              <input type="text" id="passenger-name-{{ i }}" class="input-box" 
+                     value="{% if i == 0 and user %}{{ user.full_name }}{% endif %}" placeholder="e.g. John Doe" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Passport Number *</label>
+                <input type="text" id="passenger-passport-{{ i }}" class="input-box" 
+                       value="{% if i == 0 and user %}{{ user.passport_number or '' }}{% endif %}" placeholder="e.g. A98765432" required>
+              </div>
+              <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" id="passenger-dob-{{ i }}" class="input-box" value="1992-05-15">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>In-Flight Gourmet Meal</label>
+                <select id="passenger-meal-{{ i }}" class="input-box">
+                  <option value="Hindu Vegetarian Thali">Hindu Vegetarian Thali</option>
+                  <option value="Royal Hyderabadi Biryani">Royal Hyderabadi Biryani</option>
+                  <option value="Pan-Seared Fish & Herb Butter">Pan-Seared Fish & Herb Butter</option>
+                  <option value="Vegan Mediterranean Platter">Vegan Mediterranean Platter</option>
+                  <option value="Halal Certified Chicken Supreme">Halal Certified Chicken Supreme</option>
+                  <option value="Jain Meal">Special Jain Vegetarian Meal</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Checked Baggage</label>
+                <select id="passenger-baggage-{{ i }}" class="input-box passenger-baggage-select">
+                  <option value="15">Standard 15kg/23kg (Included)</option>
+                  <option value="32">Priority 32kg (+ ₹1,200.00)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+        <!-- Order Summary & Checkout Card -->
+        <div class="card-glass" style="border-color: var(--border-gold); padding: 1.8rem;">
+          <h3 style="font-size: 1.2rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+            <span><i class="fa-solid fa-receipt" style="color: var(--gold-primary);"></i> Fare Summary</span>
+            <span id="summary-seat-count" class="badge badge-gold">0 / {{ passengers_count }} Selected</span>
+          </h3>
+
+          <div class="fare-breakdown">
+            <div class="fare-row">
+              <span>Base Fare ({{ passengers_count }} traveler{% if passengers_count > 1 %}s{% endif %})</span>
+              <span id="summary-base-fare">₹0</span>
+            </div>
+            <div class="fare-row">
+              <span>Seat Selection Upgrades</span>
+              <span id="summary-seat-addons">₹0</span>
+            </div>
+            <div class="fare-row">
+              <span>Baggage & Services</span>
+              <span id="summary-baggage-fees">₹0</span>
+            </div>
+            <div class="fare-row" style="color: var(--success);">
+              <span>Promotional Discount</span>
+              <span id="summary-discount">₹0</span>
+            </div>
+            <div class="fare-row">
+              <span>GST & Aviation Security Fees (12%)</span>
+              <span id="summary-taxes">₹0</span>
+            </div>
+            <div class="fare-row total">
+              <span>Total Payable</span>
+              <span class="price" id="summary-grand-total">₹0</span>
+            </div>
+          </div>
+
+          <!-- Promo Code Box -->
+          <div class="promo-box">
+            <input type="text" id="promo-code-input" class="input-box promo-input" placeholder="Promo code (e.g. AIRSCAN20)">
+            <button type="button" id="btn-apply-promo" class="btn btn-glass" style="padding: 0 1.1rem;">
+              Apply
+            </button>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 1.2rem;">
+            Tip: Use code <strong>AIRSCAN20</strong> for 20% off or <strong>AIRSCAN500</strong> for ₹500 instant discount.
+          </div>
+
+          <!-- Confirm Checkout Button -->
+          <button type="button" id="btn-confirm-checkout" class="btn btn-primary" style="width: 100%; height: 50px; font-size: 1.05rem;" disabled>
+            <span>Select Seats to Proceed</span>
+          </button>
+
+          <div style="text-align: center; margin-top: 1rem; font-size: 0.78rem; color: var(--text-dim); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <i class="fa-solid fa-lock" style="color: var(--success);"></i> 256-Bit SSL Encrypted Instant Reservation
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  window.BOOKING_CONFIG = {
+    flightId: {{ flight.id }},
+    cabinClass: "{{ cabin_class }}",
+    passengersCount: {{ passengers_count }},
+    baseFare: {% if cabin_class == 'First' %}{{ flight.first_price }}{% elif cabin_class == 'Business' %}{{ flight.business_price }}{% else %}{{ flight.economy_price }}{% endif %}
+  };
+</script>
+<script src="{{ url_for('static', filename='js/seat-booking.js') }}"></script>
+{% endblock %}

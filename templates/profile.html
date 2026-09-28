@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Passenger Profile — AirScan Club{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 1.5rem 5rem;">
+
+  <!-- Profile Header / Loyalty Card -->
+  <div class="card-glass" style="margin-bottom: 2.5rem; border-color: var(--border-gold); background: linear-gradient(135deg, rgba(14, 21, 37, 0.95), rgba(22, 34, 58, 0.9));">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem;">
+      <div style="display: flex; align-items: center; gap: 1.5rem;">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); display: flex; align-items: center; justify-content: center; color: #000; font-size: 2rem; font-weight: 800; box-shadow: 0 0 25px rgba(229, 184, 105, 0.4);">
+          {{ user.full_name[0] }}
+        </div>
+
+        <div>
+          <div style="display: flex; gap: 0.6rem; align-items: center; margin-bottom: 0.3rem;">
+            <h1 style="font-size: 1.8rem; margin: 0;">{{ user.full_name }}</h1>
+            <span class="badge badge-gold"><i class="fa-solid fa-crown"></i> Gold Tier</span>
+            <span class="badge badge-success"><i class="fa-solid fa-check"></i> Verified</span>
+          </div>
+          <div style="color: var(--text-muted); font-size: 0.9rem;">
+            {{ user.email }} • Member since {{ user.created_at[:10] if user.created_at else '2026' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Miles Display -->
+      <div style="background: rgba(7, 10, 18, 0.7); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.2rem 1.8rem; text-align: right;">
+        <span style="font-size: 0.75rem; color: var(--gold-primary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.08em;">
+          <i class="fa-solid fa-award"></i> AirScan Miles
+        </span>
+        <div style="font-size: 2rem; font-family: var(--font-heading); font-weight: 800; color: #fff;">
+          {{ "{:,}".format(user.miles or 0) }}
+        </div>
+        <div style="font-size: 0.72rem; color: var(--text-dim);">
+          15,500 miles needed to unlock Diamond Executive
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 2rem; align-items: start;">
+    
+    <!-- Profile Edit Form -->
+    <div class="card-glass">
+      <h3 style="font-size: 1.2rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem;">
+        <i class="fa-regular fa-id-card" style="color: var(--gold-primary);"></i> Passenger Credentials
+      </h3>
+
+      <form action="{{ url_for('profile') }}" method="POST">
+        <div class="form-group">
+          <label>Full Legal Name</label>
+          <input type="text" name="full_name" class="input-box" value="{{ user.full_name }}" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" class="input-box" value="{{ user.email }}" disabled style="opacity: 0.7; cursor: not-allowed;">
+          <span style="font-size: 0.72rem; color: var(--text-dim);">Email address is verified and permanently linked.</span>
+        </div>
+
+        <div class="form-group">
+          <label>Mobile Contact Number</label>
+          <input type="tel" name="phone" class="input-box" value="{{ user.phone or '' }}" placeholder="+1-555-0199">
+        </div>
+
+        <div class="form-group">
+          <label>Passport Number</label>
+          <input type="text" name="passport_number" class="input-box" value="{{ user.passport_number or '' }}" placeholder="A12345678" style="text-transform: uppercase;">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+          <i class="fa-solid fa-floppy-disk"></i> Save Profile Details
+        </button>
+      </form>
+    </div>
+
+    <!-- Recent Trips Activity -->
+    <div class="card-glass">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.2rem; display: flex; align-items: center; gap: 0.6rem;">
+          <i class="fa-solid fa-clock-rotate-left" style="color: var(--cyan-primary);"></i> Recent Travel Activity
+        </h3>
+        <a href="{{ url_for('my_bookings') }}" class="btn btn-glass" style="padding: 0.35rem 0.8rem; font-size: 0.78rem;">
+          View All Trips
+        </a>
+      </div>
+
+      {% if recent_bookings %}
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          {% for rb in recent_bookings %}
+            <div style="background: rgba(8, 12, 22, 0.6); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                  <span class="badge badge-gold" style="font-size: 0.7rem;">{{ rb.flight_number }}</span>
+                  <strong style="color: #fff; font-size: 0.95rem;">{{ rb.origin_code }} <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem; color: var(--gold-primary);"></i> {{ rb.destination_code }}</strong>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">
+                  PNR: {{ rb.booking_reference }} • {{ rb.departure_time[:10] }}
+                </div>
+              </div>
+
+              <div>
+                <a href="{{ url_for('view_ticket', reference=rb.booking_reference) }}" class="btn btn-glass" style="padding: 0.35rem 0.8rem; font-size: 0.75rem;">
+                  Pass <i class="fa-solid fa-chevron-right"></i>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+          No travel activity recorded yet.
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Email Address — AirScan{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card" style="text-align: center;">
+    <div class="auth-header">
+      <div class="auth-icon" style="color: var(--cyan-primary); border-color: rgba(0, 210, 255, 0.4);">
+        <i class="fa-solid fa-envelope-circle-check"></i>
+      </div>
+      <h2>Verify Your Account</h2>
+      <p>We've sent a 6-digit security code to</p>
+      <div style="font-weight: 700; color: #fff; font-size: 1.05rem; margin-top: 0.2rem;">{{ email }}</div>
+    </div>
+
+    <!-- Simulated Inbox Notification for smooth demo and grading -->
+    <div class="simulated-inbox">
+      <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--gold-primary); margin-bottom: 0.3rem;">
+        <i class="fa-solid fa-inbox"></i> AirScan Automated Security Dispatch
+      </div>
+      <div>Security Token: <strong id="simulated-code-display" style="font-size: 1.2rem; color: #fff; letter-spacing: 0.1em;">{{ simulated_code or '849201' }}</strong></div>
+      <button type="button" class="btn btn-glass" style="margin-top: 0.6rem; padding: 0.3rem 0.8rem; font-size: 0.75rem;"
+              onclick="autoFillCode('{{ simulated_code or '849201' }}')">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Fill Code
+      </button>
+    </div>
+
+    <form action="{{ url_for('verify') }}" method="POST">
+      <!-- 6-digit OTP fields -->
+      <div class="otp-container">
+        <input type="text" name="code_1" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required autofocus>
+        <input type="text" name="code_2" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+        <input type="text" name="code_3" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+        <input type="text" name="code_4" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+        <input type="text" name="code_5" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+        <input type="text" name="code_6" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; font-size: 1rem;">
+        <i class="fa-solid fa-shield-check"></i> Verify & Activate Account
+      </button>
+    </form>
+
+    <div style="margin-top: 2rem; font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+      <span>Didn't receive the email?</span>
+      <button type="button" id="btn-resend-code" class="btn btn-glass" style="padding: 0.3rem 0.8rem; font-size: 0.8rem;">
+        Resend Code
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}

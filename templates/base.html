@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AirScan — Premier Flight Search & Airline Booking{% endblock %}</title>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Design System & Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/seatmap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/boarding-pass.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Flash Notification Container -->
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message flash-{{ category }}">
+            <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-circle-exclamation{% elif category == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="{{ url_for('index') }}" class="nav-brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-plane-departure"></i>
+        </div>
+        <div class="brand-text">AIR<span>SCAN</span></div>
+      </a>
+
+      <ul class="nav-menu">
+        <li><a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}"><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a href="{{ url_for('flights') }}" class="nav-link {% if request.endpoint == 'flights' %}active{% endif %}"><i class="fa-solid fa-magnifying-glass"></i> Search Flights</a></li>
+        {% if current_user %}
+          <li><a href="{{ url_for('my_bookings') }}" class="nav-link {% if request.endpoint == 'my_bookings' %}active{% endif %}"><i class="fa-solid fa-ticket"></i> My Bookings</a></li>
+          {% if current_user.role == 'admin' %}
+            <li><a href="{{ url_for('admin_dashboard') }}" class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}"><i class="fa-solid fa-gauge-high"></i> Flight Ops</a></li>
+          {% endif %}
+        {% endif %}
+      </ul>
+
+      <div class="nav-actions">
+        {% if current_user %}
+          <a href="{{ url_for('profile') }}" class="user-badge" title="View Profile & Loyalty Tier">
+            <i class="fa-regular fa-circle-user" style="color: var(--cyan-primary);"></i>
+            <span>{{ current_user.full_name }}</span>
+            <div class="miles-pill">
+              <i class="fa-solid fa-award"></i> {{ "{:,}".format(current_user.miles or 0) }} Miles
+            </div>
+          </a>
+          <a href="{{ url_for('logout') }}" class="btn btn-glass" style="padding: 0.45rem 0.9rem;" title="Sign Out">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-glass">Sign In</a>
+          <a href="{{ url_for('register') }}" class="btn btn-primary">Join AirScan</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main View Block -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Luxury Global Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="nav-brand" style="margin-bottom: 1rem;">
+            <div class="brand-icon">
+              <i class="fa-solid fa-plane-departure"></i>
+            </div>
+            <div class="brand-text">AIR<span>SCAN</span></div>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.7; margin-bottom: 1.2rem;">
+            India's premier flight search & booking intelligence platform. Discover, compare, and instantly reserve seats across all major airlines, domestic routes, and global international hubs in Indian Rupees (₹).
+          </p>
+          <div class="db-pill">
+            <span class="dot"></span>
+            Database: <strong>{{ db_info.type }}</strong> ({{ db_info.database.split('\\')[-1] }})
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h5>Airlines & Cabins</h5>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('flights') }}">IndiGo & Vistara</a></li>
+            <li><a href="{{ url_for('flights') }}">Air India & Akasa Air</a></li>
+            <li><a href="{{ url_for('flights') }}">Emirates & Singapore Airlines</a></li>
+            <li><a href="{{ url_for('flights') }}">First Class Suites & Lie-Flat</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Quick Access</h5>
+          <ul class="footer-links">
+            <li><a href="{{ url_for('flights') }}">Flight Search</a></li>
+            <li><a href="{{ url_for('my_bookings') }}">Manage Bookings</a></li>
+            <li><a href="{{ url_for('login') }}">Member Sign In</a></li>
+            <li><a href="{{ url_for('register') }}">Join AirScan Club</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>AirScan Club Tier</h5>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+            Earn 1 tier mile for every ₹10 spent on flights across any airline. Enjoy priority boarding and complimentary seat upgrades.
+          </p>
+          <div style="display: flex; gap: 0.6rem;">
+            <span class="badge badge-gold"><i class="fa-solid fa-crown"></i> Gold Tier</span>
+            <span class="badge badge-cyan"><i class="fa-solid fa-shield-halved"></i> SkyPriority</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© {{ current_year }} AirScan Technologies. All rights reserved. Prices shown in Indian Rupees (₹).</div>
+        <div style="display: flex; gap: 1.5rem; font-size: 0.82rem;">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Carriage</a>
+          <a href="#">Security Protocol</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

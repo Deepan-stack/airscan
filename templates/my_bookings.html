@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings & Reservations — AirScan{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 1.5rem 5rem;">
+
+  <!-- Header -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <span class="badge badge-gold" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-suitcase-rolling"></i> Passenger Portal</span>
+      <h1>My Bookings & Tickets</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Manage upcoming flights, web check-in online, and view digital boarding passes.</p>
+    </div>
+
+    <a href="{{ url_for('flights') }}" class="btn btn-primary">
+      <i class="fa-solid fa-plus"></i> Search & Book More Flights
+    </a>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="search-tabs" style="margin-bottom: 2rem;">
+    <button type="button" class="trip-type-btn booking-filter-tab active" data-filter="upcoming">
+      <i class="fa-solid fa-plane-departure"></i> Upcoming Trips
+    </button>
+    <button type="button" class="trip-type-btn booking-filter-tab" data-filter="past">
+      <i class="fa-solid fa-clock-rotate-left"></i> Past & Cancelled
+    </button>
+    <button type="button" class="trip-type-btn booking-filter-tab" data-filter="all">
+      <i class="fa-solid fa-list"></i> All ({{ bookings|length }})
+    </button>
+  </div>
+
+  <!-- Bookings List -->
+  <div id="bookings-list-container">
+    {% if bookings %}
+      {% for b in bookings %}
+        <div class="card-glass booking-item-card" 
+             style="margin-bottom: 1.5rem; padding: 1.8rem;"
+             data-past="{{ 'true' if b.is_past else 'false' }}"
+             data-status="{{ b.booking_status }}">
+          
+          <!-- Top Row: Reference, Date, Status -->
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+              <span class="badge badge-gold" style="font-size: 0.82rem; letter-spacing: 0.06em;">
+                PNR: {{ b.booking_reference }}
+              </span>
+              {% if b.airline_name %}
+                <span class="badge badge-cyan" style="font-size: 0.8rem;">
+                  <i class="fa-solid fa-plane"></i> {{ b.airline_name }}
+                </span>
+              {% endif %}
+              <span style="font-size: 0.85rem; color: var(--text-muted);">
+                Booked on {{ b.booking_date[:10] }}
+              </span>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span id="status-badge-{{ b.booking_reference }}" 
+                    class="badge {% if b.booking_status == 'Checked-In' %}badge-success{% elif b.booking_status == 'Cancelled' %}badge-danger{% else %}badge-cyan{% endif %}">
+                <i class="fa-solid {% if b.booking_status == 'Checked-In' %}fa-check-circle{% elif b.booking_status == 'Cancelled' %}fa-ban{% else %}fa-circle-dot{% endif %}"></i>
+                {{ b.booking_status }}
+              </span>
+              <span style="font-size: 1.25rem; font-weight: 800; font-family: var(--font-heading); color: var(--gold-primary);">
+                ₹{{ "{:,}".format(b.total_fare|int) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Middle Row: Flight Timeline & Route -->
+          <div style="display: grid; grid-template-columns: 2.5fr 1.5fr auto; gap: 2rem; align-items: center;">
+            
+            <div class="flight-timeline">
+              <div class="time-point">
+                <div class="time" style="font-size: 1.6rem;">{{ b.origin_code }}</div>
+                <div class="city">{{ b.origin_city }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Terminal {{ b.terminal }}</div>
+              </div>
+
+              <div class="flight-path">
+                <span class="duration" style="color: var(--gold-primary); font-weight: 700;">{{ b.flight_number }}</span>
+                <div class="flight-line"></div>
+                <span class="stops" style="color: var(--text-muted);">{{ b.aircraft_model }}</span>
+              </div>
+
+              <div class="time-point dest">
+                <div class="time" style="font-size: 1.6rem;">{{ b.destination_code }}</div>
+                <div class="city">{{ b.destination_city }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Gate {{ b.gate }}</div>
+              </div>
+            </div>
+
+            <!-- Passenger and Cabin summary -->
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; margin-bottom: 0.3rem;">
+                {{ b.cabin_class }} Class • {{ b.passenger_count }} Passenger{% if b.passenger_count > 1 %}s{% endif %}
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                {% for p in b.passengers %}
+                  <div style="font-size: 0.9rem; color: #e2e8f0; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>{{ p.full_name }}</span>
+                    <span class="badge badge-gold" style="font-size: 0.68rem;">Seat {{ p.seat_number }}</span>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; min-width: 170px;">
+              {% if b.booking_status != 'Cancelled' %}
+                <a href="{{ url_for('view_ticket', reference=b.booking_reference) }}" class="btn btn-primary" style="padding: 0.55rem 1rem; font-size: 0.85rem;">
+                  <i class="fa-solid fa-ticket"></i> Boarding Pass
+                </a>
+
+                {% if b.booking_status != 'Checked-In' %}
+                  <button type="button" class="btn btn-cyan btn-action-checkin" data-ref="{{ b.booking_reference }}" style="padding: 0.55rem 1rem; font-size: 0.85rem;">
+                    <i class="fa-solid fa-mobile-screen"></i> Online Check-In
+                  </button>
+                {% endif %}
+
+                <button type="button" class="btn btn-danger-glass btn-action-cancel" 
+                        data-ref="{{ b.booking_reference }}" data-fare="{{ b.total_fare }}" style="padding: 0.45rem 1rem; font-size: 0.8rem;">
+                  <i class="fa-solid fa-xmark"></i> Cancel Flight
+                </button>
+              {% else %}
+                <span class="badge badge-danger" style="text-align: center; justify-content: center; padding: 0.5rem;">
+                  Booking Cancelled
+                </span>
+              {% endif %}
+            </div>
+
+          </div>
+
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="card-glass" style="text-align: center; padding: 4rem 2rem;">
+        <i class="fa-regular fa-calendar-xmark" style="font-size: 3rem; color: var(--text-dim); margin-bottom: 1rem;"></i>
+        <h3>No Flight Reservations Found</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+          You don't have any bookings yet. Book a flight today to explore our premier global routes.
+        </p>
+        <a href="{{ url_for('flights') }}" class="btn btn-primary">
+          <i class="fa-solid fa-magnifying-glass"></i> Explore Flights
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/manage-tickets.js') }}"></script>
+{% endblock %}

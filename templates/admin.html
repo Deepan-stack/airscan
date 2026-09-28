@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}Flight Operations & Admin Dispatch — AirScan{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.5rem 5rem;">
+
+  <!-- Admin Title Banner -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <span class="badge badge-gold" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-shield-halved"></i> Operations Command</span>
+      <h1>Flight Operations & Fleet Dispatch</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Monitor live flight statuses, passenger bookings, and schedule multi-airline routes in Indian Rupees (₹).</p>
+    </div>
+
+    <div>
+      <a href="#schedule-flight-section" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> Schedule New Flight
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Metrics 4-Card Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+    <!-- Metric 1: Total Revenue -->
+    <div class="card-glass" style="border-color: var(--border-gold);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <span style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Total Revenue</span>
+        <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(229, 184, 105, 0.15); color: var(--gold-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem;">
+          ₹
+        </div>
+      </div>
+      <div style="font-size: 2rem; font-family: var(--font-heading); font-weight: 800; color: #fff;">
+        ₹{{ "{:,.2f}".format(stats.revenue) }}
+      </div>
+      <span style="font-size: 0.75rem; color: var(--success);"><i class="fa-solid fa-arrow-trend-up"></i> Verified INR transactions</span>
+    </div>
+
+    <!-- Metric 2: Bookings -->
+    <div class="card-glass">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <span style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Confirmed Bookings</span>
+        <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(0, 210, 255, 0.15); color: var(--cyan-primary); display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-ticket"></i>
+        </div>
+      </div>
+      <div style="font-size: 2rem; font-family: var(--font-heading); font-weight: 800; color: #fff;">
+        {{ stats.bookings }}
+      </div>
+      <span style="font-size: 0.75rem; color: var(--cyan-primary);">Active passenger PNRs</span>
+    </div>
+
+    <!-- Metric 3: Active Flights -->
+    <div class="card-glass">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <span style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Scheduled Flights</span>
+        <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); color: var(--success); display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-plane-departure"></i>
+        </div>
+      </div>
+      <div style="font-size: 2rem; font-family: var(--font-heading); font-weight: 800; color: #fff;">
+        {{ stats.flights }}
+      </div>
+      <span style="font-size: 0.75rem; color: var(--success);">10 Global Hubs</span>
+    </div>
+
+    <!-- Metric 4: Registered Users -->
+    <div class="card-glass">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <span style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Club Members</span>
+        <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(168, 85, 247, 0.15); color: #c084fc; display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-users"></i>
+        </div>
+      </div>
+      <div style="font-size: 2rem; font-family: var(--font-heading); font-weight: 800; color: #fff;">
+        {{ stats.users }}
+      </div>
+      <span style="font-size: 0.75rem; color: #c084fc;">Verified accounts</span>
+    </div>
+  </div>
+
+  <!-- Live Flight Operations Table -->
+  <div class="card-glass" style="margin-bottom: 2.5rem; padding: 2rem;">
+    <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+      <span><i class="fa-solid fa-tower-broadcast" style="color: var(--gold-primary);"></i> Active Fleet Manifest & Flight Status Control</span>
+      <span class="badge badge-gold">{{ flights|length }} Monitored Flights</span>
+    </h3>
+
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+        <thead>
+          <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            <th style="padding: 0.8rem 1rem;">Flight</th>
+            <th style="padding: 0.8rem 1rem;">Route</th>
+            <th style="padding: 0.8rem 1rem;">Departure</th>
+            <th style="padding: 0.8rem 1rem;">Aircraft</th>
+            <th style="padding: 0.8rem 1rem;">Occupancy</th>
+            <th style="padding: 0.8rem 1rem;">Status</th>
+            <th style="padding: 0.8rem 1rem; text-align: right;">Update Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in flights %}
+            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04); transition: var(--transition);">
+              <td style="padding: 1rem;">
+                <span class="badge badge-gold">{{ f.flight_number }}</span>
+              </td>
+              <td style="padding: 1rem; font-weight: 700; color: #fff;">
+                {{ f.origin_code }} <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem; color: var(--gold-primary);"></i> {{ f.destination_code }}
+              </td>
+              <td style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem;">
+                {{ f.departure_time[:16] }}
+              </td>
+              <td style="padding: 1rem; color: #cbd5e1; font-size: 0.85rem;">
+                {{ f.aircraft_model }}
+              </td>
+              <td style="padding: 1rem;">
+                <span style="color: var(--cyan-primary); font-weight: 700;">{{ f.booked_seats }}</span> / {{ f.total_seats }}
+              </td>
+              <td style="padding: 1rem;">
+                <span class="badge {% if f.status == 'On Time' %}badge-success{% elif f.status == 'Boarding' %}badge-warning{% elif f.status == 'Delayed' %}badge-danger{% else %}badge-gold{% endif %}">
+                  {{ f.status }}
+                </span>
+              </td>
+              <td style="padding: 1rem; text-align: right;">
+                <form action="{{ url_for('update_flight_status') }}" method="POST" style="display: inline-flex; gap: 0.4rem; align-items: center;">
+                  <input type="hidden" name="flight_id" value="{{ f.id }}">
+                  <select name="status" class="input-box" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto;">
+                    <option value="On Time" {% if f.status == 'On Time' %}selected{% endif %}>On Time</option>
+                    <option value="Boarding" {% if f.status == 'Boarding' %}selected{% endif %}>Boarding</option>
+                    <option value="Delayed" {% if f.status == 'Delayed' %}selected{% endif %}>Delayed</option>
+                    <option value="Departed" {% if f.status == 'Departed' %}selected{% endif %}>Departed</option>
+                  </select>
+                  <input type="text" name="gate" value="{{ f.gate }}" class="input-box" style="padding: 0.35rem 0.5rem; font-size: 0.8rem; width: 60px;" placeholder="Gate">
+                  <button type="submit" class="btn btn-glass" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;">
+                    Update
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Schedule New Flight Form -->
+  <div class="card-glass" id="schedule-flight-section" style="padding: 2.2rem; margin-bottom: 2.5rem; border-color: var(--border-gold);">
+    <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem;">
+      <i class="fa-solid fa-calendar-plus" style="color: var(--gold-primary);"></i> Dispatch & Schedule New Commercial Flight
+    </h3>
+
+    <form action="{{ url_for('add_flight') }}" method="POST">
+      <div class="form-row" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="form-group">
+          <label>Flight Number *</label>
+          <input type="text" name="flight_number" class="input-box" placeholder="e.g. 6E-885 / AI-204" required>
+        </div>
+
+        <div class="form-group">
+          <label>Airline Carrier *</label>
+          <select name="airline_name" class="input-box" required>
+            <option value="IndiGo">IndiGo</option>
+            <option value="Air India">Air India</option>
+            <option value="Vistara">Vistara</option>
+            <option value="Akasa Air">Akasa Air</option>
+            <option value="SpiceJet">SpiceJet</option>
+            <option value="Emirates">Emirates</option>
+            <option value="Qatar Airways">Qatar Airways</option>
+            <option value="Singapore Airlines">Singapore Airlines</option>
+            <option value="British Airways">British Airways</option>
+            <option value="Lufthansa">Lufthansa</option>
+            <option value="Etihad Airways">Etihad Airways</option>
+            <option value="AirScan">AirScan</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Origin Hub *</label>
+          <select name="origin_id" class="input-box" required>
+            {% for a in airports %}
+              <option value="{{ a.id }}">{{ a.city }} ({{ a.code }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Destination Hub *</label>
+          <select name="destination_id" class="input-box" required>
+            {% for a in airports %}
+              <option value="{{ a.id }}">{{ a.city }} ({{ a.code }})</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="form-group">
+          <label>Departure Date & Time *</label>
+          <input type="datetime-local" name="departure_time" class="input-box" required>
+        </div>
+
+        <div class="form-group">
+          <label>Arrival Date & Time *</label>
+          <input type="datetime-local" name="arrival_time" class="input-box" required>
+        </div>
+
+        <div class="form-group">
+          <label>Duration (Minutes) *</label>
+          <input type="number" name="duration_minutes" class="input-box" value="130" required>
+        </div>
+
+        <div class="form-group">
+          <label>Aircraft Fleet Type *</label>
+          <select name="aircraft_model" class="input-box">
+            <option value="Airbus A321neo">Airbus A321neo</option>
+            <option value="Airbus A320neo">Airbus A320neo</option>
+            <option value="Boeing 787-9 Dreamliner">Boeing 787-9 Dreamliner</option>
+            <option value="Boeing 777-300ER">Boeing 777-300ER</option>
+            <option value="Boeing 737 MAX 8">Boeing 737 MAX 8</option>
+            <option value="Airbus A350-900">Airbus A350-900</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row" style="grid-template-columns: repeat(5, 1fr);">
+        <div class="form-group">
+          <label>Economy Base (₹)</label>
+          <input type="number" name="economy_price" class="input-box" value="4800" required>
+        </div>
+
+        <div class="form-group">
+          <label>Business Base (₹)</label>
+          <input type="number" name="business_price" class="input-box" value="16500" required>
+        </div>
+
+        <div class="form-group">
+          <label>First Class Base (₹)</label>
+          <input type="number" name="first_price" class="input-box" value="32000" required>
+        </div>
+
+        <div class="form-group">
+          <label>Terminal</label>
+          <input type="text" name="terminal" class="input-box" value="T2">
+        </div>
+
+        <div class="form-group">
+          <label>Gate</label>
+          <input type="text" name="gate" class="input-box" value="Gate 14">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="margin-top: 1rem; padding: 0.75rem 2rem;">
+        <i class="fa-solid fa-plane-circle-check"></i> Dispatch Flight & Initialize 60-Seat Fuselage
+      </button>
+    </form>
+  </div>
+
+  <!-- Recent Passenger Bookings Table -->
+  <div class="card-glass" style="padding: 2rem;">
+    <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem;">
+      <i class="fa-solid fa-receipt" style="color: var(--cyan-primary);"></i> Recent Confirmed Passenger Bookings
+    </h3>
+
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+        <thead>
+          <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">
+            <th style="padding: 0.8rem 1rem;">PNR</th>
+            <th style="padding: 0.8rem 1rem;">Passenger</th>
+            <th style="padding: 0.8rem 1rem;">Email</th>
+            <th style="padding: 0.8rem 1rem;">Flight</th>
+            <th style="padding: 0.8rem 1rem;">Class</th>
+            <th style="padding: 0.8rem 1rem;">Total Fare</th>
+            <th style="padding: 0.8rem 1rem;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+              <td style="padding: 1rem;">
+                <span class="badge badge-gold">{{ b.booking_reference }}</span>
+              </td>
+              <td style="padding: 1rem; font-weight: 700; color: #fff;">{{ b.passenger_name }}</td>
+              <td style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem;">{{ b.email }}</td>
+              <td style="padding: 1rem; font-weight: 700; color: var(--cyan-primary);">{{ b.flight_number }}</td>
+              <td style="padding: 1rem;">{{ b.cabin_class }}</td>
+              <td style="padding: 1rem; font-weight: 700; color: var(--gold-primary);">₹{{ "{:,}".format(b.total_fare|int) }}</td>
+              <td style="padding: 1rem;">
+                <span class="badge {% if b.booking_status == 'Checked-In' %}badge-success{% elif b.booking_status == 'Cancelled' %}badge-danger{% else %}badge-cyan{% endif %}">
+                  {{ b.booking_status }}
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+
+{% block title %}AirScan — Search Flights, Compare Airlines & Book Tickets{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" style="background-image: url('{{ url_for('static', filename='images/hero-jet.jpg') }}');">
+  <div class="hero-overlay"></div>
+  <div class="container hero-content">
+    <div class="hero-tagline">
+      <i class="fa-solid fa-plane-circle-check"></i> Live Flight Search & Multi-Airline Booking
+    </div>
+    <h1 class="hero-title">
+      Search, Compare & Book Across <span>All Major Airlines</span>
+    </h1>
+    <p class="hero-subtitle">
+      Instantly scan real-time flight schedules and the best fares across IndiGo, Air India, Vistara, Akasa Air, Emirates, Singapore Airlines, and 30+ airports in Indian Rupees (₹).
+    </p>
+  </div>
+</section>
+
+<!-- Flight Search Widget -->
+<section class="container" style="position: relative; z-index: 10;">
+  <div class="search-widget">
+    <form action="{{ url_for('flights') }}" method="GET">
+      <div class="search-tabs">
+        <button type="button" class="trip-type-btn active" data-trip="one-way">
+          <i class="fa-solid fa-arrow-right"></i> One-Way
+        </button>
+        <button type="button" class="trip-type-btn" data-trip="round-trip">
+          <i class="fa-solid fa-right-left"></i> Round-Trip
+        </button>
+        <input type="hidden" name="trip_type" id="trip-type-input" value="one-way">
+      </div>
+
+      <div class="search-grid">
+        <!-- Origin -->
+        <div class="search-field">
+          <label><i class="fa-solid fa-plane-departure" style="color: var(--gold-primary);"></i> Departure City</label>
+          <select name="origin" class="input-box" required>
+            <option value="">Select departure airport</option>
+            {% for a in airports %}
+              <option value="{{ a.code }}">{{ a.city }} ({{ a.code }}) - {{ a.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Destination -->
+        <div class="search-field">
+          <label><i class="fa-solid fa-plane-arrival" style="color: var(--cyan-primary);"></i> Destination</label>
+          <select name="destination" class="input-box" required>
+            <option value="">Select arrival airport</option>
+            {% for a in airports %}
+              <option value="{{ a.code }}">{{ a.city }} ({{ a.code }}) - {{ a.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Departure Date -->
+        <div class="search-field">
+          <label><i class="fa-regular fa-calendar"></i> Date</label>
+          <input type="date" name="date" id="dep-date-input" class="input-box" required>
+        </div>
+
+        <!-- Return Date (Hidden initially for one-way) -->
+        <div class="search-field" id="return-date-field" style="display: none;">
+          <label><i class="fa-regular fa-calendar-check"></i> Return</label>
+          <input type="date" name="return_date" id="ret-date-input" class="input-box">
+        </div>
+
+        <!-- Passengers -->
+        <div class="search-field">
+          <label><i class="fa-solid fa-user-group"></i> Guests</label>
+          <select name="passengers" class="input-box">
+            <option value="1">1 Passenger</option>
+            <option value="2">2 Passengers</option>
+            <option value="3">3 Passengers</option>
+            <option value="4">4 Passengers</option>
+          </select>
+        </div>
+
+        <!-- Cabin Class -->
+        <div class="search-field">
+          <label><i class="fa-solid fa-gem" style="color: var(--gold-primary);"></i> Cabin Class</label>
+          <select name="cabin_class" class="input-box">
+            <option value="Economy">Economy Class</option>
+            <option value="Business" selected>Business Class</option>
+            <option value="First">First Class Suites</option>
+          </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+          <button type="submit" class="btn btn-primary" style="height: 48px; width: 100%;">
+            <i class="fa-solid fa-magnifying-glass"></i> Search Flights
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Featured Flight Routes -->
+<section class="container" style="padding: 4.5rem 1.5rem 3rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+    <div>
+      <span class="badge badge-gold" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-compass"></i> Popular Journeys</span>
+      <h2>Featured Flagship Routes</h2>
+    </div>
+    <a href="{{ url_for('flights') }}" class="btn btn-glass">
+      View All Schedules <i class="fa-solid fa-arrow-right"></i>
+    </a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+    {% for flight in featured_flights %}
+      <div class="card-glass" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <span class="badge badge-gold" style="font-weight: 700;"><i class="fa-solid fa-plane"></i> {{ flight.airline_name }}</span>
+            <span class="badge badge-cyan">{{ flight.flight_number }}</span>
+          </div>
+          <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> {{ flight.status }}</span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+          <div>
+            <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-heading); color: #fff;">{{ flight.origin_code }}</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">{{ flight.origin_city }}</div>
+          </div>
+
+          <div style="flex: 1; padding: 0 1rem; text-align: center;">
+            <div style="font-size: 0.72rem; color: var(--gold-primary); font-weight: 700;">{{ flight.aircraft_model }}</div>
+            <div style="width: 100%; height: 2px; background: linear-gradient(90deg, var(--gold-primary), var(--cyan-primary)); margin: 0.4rem 0; position: relative;">
+              <i class="fa-solid fa-plane" style="position: absolute; top: -6px; left: 45%; font-size: 0.8rem; color: #fff;"></i>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-dim);">Non-stop</div>
+          </div>
+
+          <div style="text-align: right;">
+            <div style="font-size: 1.8rem; font-weight: 800; font-family: var(--font-heading); color: #fff;">{{ flight.destination_code }}</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">{{ flight.destination_city }}</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 1.2rem;">
+          <div>
+            <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">From</span>
+            <div style="font-size: 1.4rem; font-weight: 800; color: var(--gold-primary); font-family: var(--font-heading);">
+              ₹{{ "{:,}".format(flight.economy_price|int) }}
+            </div>
+          </div>
+          <a href="{{ url_for('book_flight', flight_id=flight.id, cabin_class='Economy') }}" class="btn btn-primary" style="padding: 0.5rem 1.1rem; font-size: 0.85rem;">
+            Book Flight <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Luxury Cabin Showcase -->
+<section class="container" style="padding: 3rem 1.5rem 5rem;">
+  <div class="card-glass" style="padding: 0; overflow: hidden; border-color: var(--border-gold);">
+    <div style="display: grid; grid-template-columns: 1.1fr 1.3fr; align-items: center;">
+      <div style="padding: 3.5rem;">
+        <span class="badge badge-gold" style="margin-bottom: 1rem;"><i class="fa-solid fa-award"></i> The Royal Cabin Experience</span>
+        <h2 style="font-size: 2.4rem; line-height: 1.2; margin-bottom: 1.2rem;">
+          Indulge in Ultimate Elegance at 40,000 Feet
+        </h2>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; line-height: 1.8;">
+          Our Boeing 787-9 and Airbus A350 fleet features handcrafted walnut private suites, 180° lie-flat memory foam bedding, ambient lighting, and bespoke champagne service by dedicated flight sommeliers.
+        </p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 2.2rem;">
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <i class="fa-solid fa-bed" style="color: var(--gold-primary); font-size: 1.2rem; margin-top: 0.2rem;"></i>
+            <div>
+              <strong style="color: #fff; display: block; font-size: 0.95rem;">Full Lie-Flat Bed</strong>
+              <span style="font-size: 0.8rem; color: var(--text-dim);">82-inch length with silk pillows</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <i class="fa-solid fa-utensils" style="color: var(--gold-primary); font-size: 1.2rem; margin-top: 0.2rem;"></i>
+            <div>
+              <strong style="color: #fff; display: block; font-size: 0.95rem;">Michelin Dining</strong>
+              <span style="font-size: 0.8rem; color: var(--text-dim);">Multi-course curated menu</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <i class="fa-solid fa-wifi" style="color: var(--gold-primary); font-size: 1.2rem; margin-top: 0.2rem;"></i>
+            <div>
+              <strong style="color: #fff; display: block; font-size: 0.95rem;">High-Speed SkyNet</strong>
+              <span style="font-size: 0.8rem; color: var(--text-dim);">Unlimited gigabit Wi-Fi</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <i class="fa-solid fa-car" style="color: var(--gold-primary); font-size: 1.2rem; margin-top: 0.2rem;"></i>
+            <div>
+              <strong style="color: #fff; display: block; font-size: 0.95rem;">Chauffeur Drive</strong>
+              <span style="font-size: 0.8rem; color: var(--text-dim);">Airport private luxury transfer</span>
+            </div>
+          </div>
+        </div>
+
+        <a href="{{ url_for('flights', cabin_class='First') }}" class="btn btn-primary">
+          Explore First Class Suites <i class="fa-solid fa-crown"></i>
+        </a>
+      </div>
+
+      <div style="height: 100%; min-height: 440px; background-image: url('{{ url_for('static', filename='images/first-class.jpg') }}'); background-size: cover; background-position: center;">
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

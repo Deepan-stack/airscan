@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Register — Join AirScan Club{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card auth-card-wide">
+    <div class="auth-header">
+      <div class="auth-icon">
+        <i class="fa-solid fa-plane-departure"></i>
+      </div>
+      <h2>Join AirScan Club</h2>
+      <p>Enjoy 5,000 complimentary bonus miles and instant priority bookings</p>
+    </div>
+
+    <form action="{{ url_for('register') }}" method="POST">
+      <div class="form-group">
+        <label><i class="fa-regular fa-user"></i> Full Legal Name (as on Passport / Aadhaar) *</label>
+        <input type="text" name="full_name" class="input-box" placeholder="e.g. Rahul Sharma" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label><i class="fa-regular fa-envelope"></i> Email Address *</label>
+          <input type="email" name="email" class="input-box" placeholder="rahul@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-phone"></i> Mobile Phone</label>
+          <input type="tel" name="phone" class="input-box" placeholder="+91-98765-43210">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fa-solid fa-passport"></i> Passport / National ID Number</label>
+        <input type="text" name="passport_number" class="input-box" placeholder="e.g. Z9876543" style="text-transform: uppercase;">
+        <span style="font-size: 0.72rem; color: var(--text-dim);">Required for flight check-in and boarding pass issuance.</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label><i class="fa-solid fa-lock"></i> Password *</label>
+          <input type="password" name="password" class="input-box" placeholder="Min. 6 characters" required>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-shield-halved"></i> Confirm Password *</label>
+          <input type="password" name="confirm_password" class="input-box" placeholder="Re-enter password" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; margin-top: 1rem; font-size: 1rem;">
+        Create Account & Send Verification Code
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.8rem; font-size: 0.88rem; color: var(--text-muted);">
+      Already a member of AirScan? 
+      <a href="{{ url_for('login') }}" style="font-weight: 700;">Sign In Here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

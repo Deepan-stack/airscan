@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Flight Search Results — AirScan{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.5rem 4rem;">
+
+  <!-- Search Summary Banner -->
+  <div class="card-glass" style="margin-bottom: 2rem; padding: 1.2rem 1.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+      <div>
+        <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Journey</span>
+        <div style="font-size: 1.2rem; font-weight: 800; color: #fff;">
+          {% if origin and destination %}
+            {{ origin }} <i class="fa-solid fa-arrow-right" style="color: var(--gold-primary); font-size: 0.9rem;"></i> {{ destination }}
+          {% else %}
+            All Scheduled Destinations
+          {% endif %}
+        </div>
+      </div>
+
+      <div style="border-left: 1px solid rgba(255, 255, 255, 0.1); padding-left: 1.5rem;">
+        <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Cabin Class</span>
+        <div style="font-size: 1.05rem; font-weight: 700; color: var(--cyan-primary);">{{ cabin_class }} Class</div>
+      </div>
+
+      <div style="border-left: 1px solid rgba(255, 255, 255, 0.1); padding-left: 1.5rem;">
+        <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Passengers</span>
+        <div style="font-size: 1.05rem; font-weight: 700; color: #fff;">{{ passengers }} Guest{% if passengers > 1 %}s{% endif %}</div>
+      </div>
+    </div>
+
+    <div>
+      <span class="badge badge-gold" id="flights-count">{{ flights|length }} Flights Available</span>
+    </div>
+  </div>
+
+  <!-- Layout: Sidebar Filters + Flight Results -->
+  <div style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem; align-items: start;">
+    
+    <!-- Filter Sidebar -->
+    <aside class="card-glass" style="position: sticky; top: 90px; padding: 1.5rem;">
+      <h3 style="font-size: 1.1rem; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between;">
+        <span><i class="fa-solid fa-sliders" style="color: var(--gold-primary);"></i> Filter Flights</span>
+      </h3>
+
+      <!-- Cabin Selection -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.4rem;">
+          Cabin Experience
+        </label>
+        <select id="results-cabin-select" class="input-box">
+          <option value="Economy" {% if cabin_class == 'Economy' %}selected{% endif %}>Economy Class</option>
+          <option value="Business" {% if cabin_class == 'Business' %}selected{% endif %}>Business Class</option>
+          <option value="First" {% if cabin_class == 'First' %}selected{% endif %}>First Class Suites</option>
+        </select>
+      </div>
+
+      <!-- Airline Filter -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.4rem;">
+          Airline Carrier
+        </label>
+        <select id="filter-airline" class="input-box">
+          <option value="all">All Airlines (IndiGo, Air India, etc.)</option>
+          {% for al in airlines %}
+            <option value="{{ al }}" {% if selected_airline == al %}selected{% endif %}>{{ al }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Max Price Range Slider in INR -->
+      <div style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+          <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Max Price (₹)</label>
+          <span id="price-display" style="font-size: 0.85rem; font-weight: 700; color: var(--gold-primary);">₹2,50,000</span>
+        </div>
+        <input type="range" id="price-range-slider" min="2000" max="250000" step="1000" value="250000" style="width: 100%; accent-color: var(--gold-primary); cursor: pointer;">
+      </div>
+
+      <!-- Direct Flights Only Toggle -->
+      <div style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem;">
+        <input type="checkbox" id="filter-direct-only" checked style="accent-color: var(--gold-primary); width: 16px; height: 16px; cursor: pointer;">
+        <label for="filter-direct-only" style="font-size: 0.85rem; color: #e2e8f0; cursor: pointer;">Non-stop Flights Only</label>
+      </div>
+
+      <!-- Aircraft Model Filter -->
+      <div style="margin-bottom: 1.5rem;">
+        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.4rem;">
+          Aircraft Fleet
+        </label>
+        <select id="filter-aircraft" class="input-box">
+          <option value="all">All Aircraft</option>
+          <option value="Airbus A320">Airbus A320 / A321neo</option>
+          <option value="Boeing 787">Boeing 787 Dreamliner</option>
+          <option value="Boeing 777">Boeing 777-300ER</option>
+          <option value="Airbus A350">Airbus A350</option>
+          <option value="Boeing 737">Boeing 737 MAX</option>
+        </select>
+      </div>
+
+      <!-- Sort By -->
+      <div>
+        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 0.4rem;">
+          Sort By
+        </label>
+        <select id="sort-by-select" class="input-box">
+          <option value="price-asc">Lowest Price First</option>
+          <option value="price-desc">Highest Price First</option>
+          <option value="duration-asc">Shortest Flight Duration</option>
+        </select>
+      </div>
+    </aside>
+
+    <!-- Flight Results List -->
+    <div>
+      <div id="flights-list-container">
+        {% if flights %}
+          {% for fl in flights %}
+            <div class="flight-card" 
+                 data-price-economy="{{ fl.economy_price }}"
+                 data-price-business="{{ fl.business_price }}"
+                 data-price-first="{{ fl.first_price }}"
+                 data-duration="{{ fl.duration_minutes }}"
+                 data-airline="{{ fl.airline_name }}"
+                 data-aircraft="{{ fl.aircraft_model }}"
+                 data-stops="0">
+              
+              <!-- Airline & Aircraft Info -->
+              <div class="flight-airline">
+                <div class="airline-logo-box">
+                  <i class="fa-solid fa-plane-departure"></i>
+                </div>
+                <div class="airline-info">
+                  <h4>{{ fl.airline_name }}</h4>
+                  <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 0.2rem;">
+                    <span class="badge badge-gold" style="font-size: 0.7rem;">{{ fl.flight_number }}</span>
+                    <span>{{ fl.aircraft_model }}</span>
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--cyan-primary); margin-top: 0.3rem;">
+                    <i class="fa-solid fa-chair"></i> {{ fl.available_seats }} seats available
+                  </div>
+                </div>
+              </div>
+
+              <!-- Flight Schedule Timeline -->
+              <div class="flight-timeline">
+                <div class="time-point">
+                  <div class="time">{{ fl.dep_time_formatted.split(' • ')[0] }}</div>
+                  <div class="airport">{{ fl.origin_code }}</div>
+                  <div class="city">{{ fl.origin_city }}</div>
+                  <div style="font-size: 0.7rem; color: var(--text-dim);">Terminal {{ fl.terminal }}</div>
+                </div>
+
+                <div class="flight-path">
+                  <span class="duration"><i class="fa-regular fa-clock"></i> {{ fl.duration_formatted }}</span>
+                  <div class="flight-line"></div>
+                  <span class="stops">Direct • Non-Stop</span>
+                </div>
+
+                <div class="time-point dest">
+                  <div class="time">{{ fl.arr_time_formatted.split(' • ')[0] }}</div>
+                  <div class="airport">{{ fl.destination_code }}</div>
+                  <div class="city">{{ fl.destination_city }}</div>
+                  <div style="font-size: 0.7rem; color: var(--text-dim);">Gate {{ fl.gate }}</div>
+                </div>
+              </div>
+
+              <!-- Pricing and Perks in INR -->
+              <div class="flight-pricing">
+                <div class="price-label">Starting From</div>
+                <div class="price-val">
+                  {% if cabin_class == 'First' %}
+                    ₹{{ "{:,}".format(fl.first_price|int) }}
+                  {% elif cabin_class == 'Business' %}
+                    ₹{{ "{:,}".format(fl.business_price|int) }}
+                  {% else %}
+                    ₹{{ "{:,}".format(fl.economy_price|int) }}
+                  {% endif %}
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-dim);">per traveler • taxes incl.</div>
+              </div>
+
+              <!-- Action Button -->
+              <div>
+                <a href="{{ url_for('book_flight', flight_id=fl.id, cabin_class=cabin_class, passengers=passengers) }}" 
+                   class="btn btn-primary btn-book-flight" style="padding: 0.75rem 1.4rem;">
+                  Select Seats <i class="fa-solid fa-chevron-right"></i>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="card-glass" style="text-align: center; padding: 4rem 2rem;">
+            <i class="fa-solid fa-plane-slash" style="font-size: 3rem; color: var(--text-dim); margin-bottom: 1rem;"></i>
+            <h3>No Scheduled Flights Found</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+              No flights match your exact search criteria. Please adjust your destination or dates.
+            </p>
+            <a href="{{ url_for('flights') }}" class="btn btn-primary">
+              View All Scheduled Routes
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/flight-search.js') }}"></script>
+{% endblock %}

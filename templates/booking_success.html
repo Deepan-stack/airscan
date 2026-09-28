@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Confirmed — AirScan{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 4rem 1.5rem; max-width: 800px; text-align: center;">
+
+  <div class="card-glass" style="border-color: var(--border-gold); padding: 3rem 2.5rem;">
+    <!-- Animated Checkmark Circle -->
+    <div style="width: 80px; height: 80px; margin: 0 auto 1.5rem; border-radius: 50%; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05)); border: 2px solid var(--success); display: flex; align-items: center; justify-content: center; color: var(--success); font-size: 2.2rem; box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);">
+      <i class="fa-solid fa-check"></i>
+    </div>
+
+    <span class="badge badge-success" style="font-size: 0.85rem; padding: 0.35rem 1rem; margin-bottom: 1rem;">
+      <i class="fa-solid fa-shield-check"></i> Payment Confirmed & Verified
+    </span>
+
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.8rem;">
+      Bon Voyage! Your Flight is Booked.
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 580px; margin: 0 auto 2.5rem;">
+      We have sent your electronic ticket and confirmation receipt to your registered email address.
+    </p>
+
+    <!-- Booking Reference Highlight Box -->
+    <div style="background: rgba(7, 10, 18, 0.8); border: 1px dashed var(--border-gold); border-radius: var(--radius-md); padding: 1.5rem; max-width: 480px; margin: 0 auto 2.5rem; display: flex; align-items: center; justify-content: space-between;">
+      <div style="text-align: left;">
+        <span style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Booking Reference (PNR)</span>
+        <div style="font-size: 1.8rem; font-family: var(--font-heading); font-weight: 800; color: var(--gold-primary); letter-spacing: 0.08em;">
+          {{ booking.booking_reference }}
+        </div>
+      </div>
+      <div>
+        <span class="badge badge-gold" style="font-size: 0.8rem;">{{ booking.cabin_class }} Class</span>
+      </div>
+    </div>
+
+    <!-- Flight Details Quick Grid -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; text-align: left; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 2.5rem;">
+      <div>
+        <span style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase;">Flight & Airline</span>
+        <div style="font-size: 1.15rem; font-weight: 700; color: #fff;">{{ booking.flight_number }}</div>
+        <div style="font-size: 0.8rem; color: var(--gold-primary); font-weight: 600;">{{ booking.airline_name }}</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ booking.aircraft_model }}</div>
+      </div>
+
+      <div>
+        <span style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase;">Route</span>
+        <div style="font-size: 1.15rem; font-weight: 700; color: var(--cyan-primary);">
+          {{ booking.origin_code }} <i class="fa-solid fa-arrow-right" style="font-size: 0.8rem;"></i> {{ booking.destination_code }}
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">{{ booking.departure_time }}</div>
+      </div>
+
+      <div>
+        <span style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase;">Passengers & Seats</span>
+        {% for p in passengers %}
+          <div style="font-size: 0.95rem; font-weight: 600; color: #fff;">
+            {{ p.full_name }} — <span style="color: var(--gold-primary);">Seat {{ p.seat_number }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="{{ url_for('view_ticket', reference=booking.booking_reference) }}" class="btn btn-primary" style="padding: 0.85rem 1.8rem; font-size: 1rem;">
+        <i class="fa-solid fa-ticket"></i> View & Print Boarding Pass
+      </a>
+      <a href="{{ url_for('my_bookings') }}" class="btn btn-glass" style="padding: 0.85rem 1.8rem; font-size: 1rem;">
+        <i class="fa-solid fa-list-check"></i> Manage In My Bookings
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
