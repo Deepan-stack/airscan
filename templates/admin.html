@@ -3,10 +3,10 @@
 {% block title %}Flight Operations & Admin Dispatch — AirScan{% endblock %}
 
 {% block content %}
-<div class="container" style="padding: 2.5rem 1.5rem 5rem;">
+<div class="container admin-container">
 
   <!-- Admin Title Banner -->
-  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+  <div class="admin-header-banner">
     <div>
       <span class="badge badge-gold" style="margin-bottom: 0.5rem;"><i class="fa-solid fa-shield-halved"></i> Operations Command</span>
       <h1>Flight Operations & Fleet Dispatch</h1>
@@ -21,7 +21,7 @@
   </div>
 
   <!-- Key Metrics 4-Card Grid -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-bottom: 2.5rem;">
     <!-- Metric 1: Total Revenue -->
     <div class="card-glass" style="border-color: var(--border-gold);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
@@ -80,14 +80,14 @@
   </div>
 
   <!-- Live Flight Operations Table -->
-  <div class="card-glass" style="margin-bottom: 2.5rem; padding: 2rem;">
-    <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+  <div class="card-glass" style="margin-bottom: 2.5rem;">
+    <h3 style="font-size: 1.25rem; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem;">
       <span><i class="fa-solid fa-tower-broadcast" style="color: var(--gold-primary);"></i> Active Fleet Manifest & Flight Status Control</span>
       <span class="badge badge-gold">{{ flights|length }} Monitored Flights</span>
     </h3>
 
-    <div style="overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+    <div class="table-responsive">
+      <table class="admin-table">
         <thead>
           <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
             <th style="padding: 0.8rem 1rem;">Flight</th>
@@ -123,7 +123,7 @@
                 </span>
               </td>
               <td style="padding: 1rem; text-align: right;">
-                <form action="{{ url_for('update_flight_status') }}" method="POST" style="display: inline-flex; gap: 0.4rem; align-items: center;">
+                <form action="{{ url_for('update_flight_status') }}" method="POST" style="display: inline-flex; gap: 0.4rem; align-items: center; justify-content: flex-end;">
                   <input type="hidden" name="flight_id" value="{{ f.id }}">
                   <select name="status" class="input-box" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; width: auto;">
                     <option value="On Time" {% if f.status == 'On Time' %}selected{% endif %}>On Time</option>
@@ -145,13 +145,13 @@
   </div>
 
   <!-- Schedule New Flight Form -->
-  <div class="card-glass" id="schedule-flight-section" style="padding: 2.2rem; margin-bottom: 2.5rem; border-color: var(--border-gold);">
+  <div class="card-glass" id="schedule-flight-section" style="margin-bottom: 2.5rem; border-color: var(--border-gold);">
     <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem;">
       <i class="fa-solid fa-calendar-plus" style="color: var(--gold-primary);"></i> Dispatch & Schedule New Commercial Flight
     </h3>
 
     <form action="{{ url_for('add_flight') }}" method="POST">
-      <div class="form-row" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="admin-form-grid-4">
         <div class="form-group">
           <label>Flight Number *</label>
           <input type="text" name="flight_number" class="input-box" placeholder="e.g. 6E-885 / AI-204" required>
@@ -194,7 +194,7 @@
         </div>
       </div>
 
-      <div class="form-row" style="grid-template-columns: repeat(4, 1fr);">
+      <div class="admin-form-grid-4">
         <div class="form-group">
           <label>Departure Date & Time *</label>
           <input type="datetime-local" name="departure_time" class="input-box" required>
@@ -223,7 +223,7 @@
         </div>
       </div>
 
-      <div class="form-row" style="grid-template-columns: repeat(5, 1fr);">
+      <div class="admin-form-grid-5">
         <div class="form-group">
           <label>Economy Base (₹)</label>
           <input type="number" name="economy_price" class="input-box" value="4800" required>
@@ -250,20 +250,20 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary" style="margin-top: 1rem; padding: 0.75rem 2rem;">
+      <button type="submit" class="btn btn-primary btn-dispatch-submit">
         <i class="fa-solid fa-plane-circle-check"></i> Dispatch Flight & Initialize 60-Seat Fuselage
       </button>
     </form>
   </div>
 
   <!-- Recent Passenger Bookings Table -->
-  <div class="card-glass" style="padding: 2rem;">
-    <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem;">
+  <div class="card-glass" style="margin-bottom: 2.5rem;">
+    <h3 style="font-size: 1.25rem; margin-bottom: 1.2rem;">
       <i class="fa-solid fa-receipt" style="color: var(--cyan-primary);"></i> Recent Confirmed Passenger Bookings
     </h3>
 
-    <div style="overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+    <div class="table-responsive">
+      <table class="admin-table">
         <thead>
           <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">
             <th style="padding: 0.8rem 1rem;">PNR</th>
