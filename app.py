@@ -3,7 +3,7 @@ import random
 import string
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, abort, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
 from db import Database
@@ -71,6 +71,10 @@ def generate_reference():
 
 def generate_ticket_num():
     return f"TKT-{''.join(random.choices(string.digits, k=8))}"
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # ==========================================
 # AUTHENTICATION & VERIFICATION ROUTES
