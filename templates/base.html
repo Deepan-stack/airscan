@@ -54,6 +54,8 @@
           {% if current_user.role == 'admin' %}
             <li><a href="{{ url_for('admin_dashboard') }}" class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}"><i class="fa-solid fa-gauge-high"></i> Flight Ops</a></li>
           {% endif %}
+          <li class="mobile-only"><a href="{{ url_for('profile') }}" class="nav-link {% if request.endpoint == 'profile' %}active{% endif %}"><i class="fa-regular fa-circle-user"></i> Profile ({{ "{:,}".format(current_user.miles or 0) }} Miles)</a></li>
+          <li class="mobile-only"><a href="{{ url_for('logout') }}" class="nav-link" style="color: #f87171;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out</a></li>
         {% endif %}
       </ul>
 
@@ -66,7 +68,7 @@
               <i class="fa-solid fa-award"></i> {{ "{:,}".format(current_user.miles or 0) }} Miles
             </div>
           </a>
-          <a href="{{ url_for('logout') }}" class="btn btn-glass" style="padding: 0.45rem 0.9rem;" title="Sign Out">
+          <a href="{{ url_for('logout') }}" class="btn btn-glass desktop-only" style="padding: 0.45rem 0.9rem;" title="Sign Out">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
           </a>
         {% else %}
