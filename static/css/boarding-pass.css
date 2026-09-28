@@ -209,6 +209,65 @@
   height: 100%;
 }
 
+/* ==========================================================
+   RESPONSIVE BOARDING PASS (Mobile & Tablets)
+   ========================================================== */
+@media (max-width: 768px) {
+  .boarding-pass-card {
+    flex-direction: column;
+    margin: 1rem auto;
+    border-radius: 18px;
+  }
+
+  .pass-main {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .pass-stub {
+    border-left: none;
+    border-top: 2px dashed rgba(255, 255, 255, 0.2);
+    padding: 1.5rem 1.25rem;
+  }
+
+  /* Notches move to left and right edges on mobile vertical pass */
+  .pass-stub::before {
+    top: -12px;
+    left: -12px;
+  }
+
+  .pass-stub::after {
+    top: -12px;
+    left: auto;
+    right: -12px;
+    bottom: auto;
+  }
+
+  .pass-route {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .pass-details-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pass-route .code {
+    font-size: 1.7rem;
+  }
+
+  .pass-brand .title {
+    font-size: 1.1rem;
+  }
+
+  .qr-code-box {
+    width: 75px;
+    height: 75px;
+  }
+}
+
 /* Print Sheet Styling */
 @media print {
   body {

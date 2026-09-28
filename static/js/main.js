@@ -113,6 +113,37 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // 6. Mobile Navigation Drawer Toggle
+  const navToggle = document.getElementById('nav-toggle');
+  const navMenu = document.querySelector('.nav-menu');
+  const navActions = document.querySelector('.nav-actions');
+
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navToggle.classList.toggle('active');
+      navMenu.classList.toggle('open');
+      if (navActions) navActions.classList.toggle('open');
+    });
+
+    // Close menu when clicking outside or clicking any nav link
+    document.addEventListener('click', (e) => {
+      if (!navToggle.contains(e.target) && !navMenu.contains(e.target) && (!navActions || !navActions.contains(e.target))) {
+        navToggle.classList.remove('active');
+        navMenu.classList.remove('open');
+        if (navActions) navActions.classList.remove('open');
+      }
+    });
+
+    navMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        navToggle.classList.remove('active');
+        navMenu.classList.remove('open');
+        if (navActions) navActions.classList.remove('open');
+      });
+    });
+  }
 });
 
 function startResendCountdown(btn, seconds) {

@@ -338,8 +338,116 @@
   text-transform: uppercase;
 }
 
-@media (max-width: 900px) {
+/* ==========================================================
+   RESPONSIVE CABIN SEATMAP (Laptops, Tablets & Phones)
+   ========================================================== */
+
+@media (max-width: 1024px) {
   .booking-layout {
     grid-template-columns: 1fr;
+    gap: 1.8rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .airplane-wrapper {
+    padding: 2rem 0.6rem;
+    border-radius: 28px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cockpit-cone {
+    width: 150px;
+    height: 75px;
+    margin-bottom: 1.8rem;
+    font-size: 0.72rem;
+  }
+
+  .cockpit-window {
+    width: 18px;
+    height: 10px;
+  }
+
+  .seat-legend {
+    gap: 0.75rem;
+    font-size: 0.72rem;
+    padding: 0.6rem;
+  }
+
+  .legend-box {
+    width: 16px;
+    height: 16px;
+  }
+
+  .seat-row {
+    gap: 0.35rem;
+  }
+
+  .row-number {
+    width: 20px;
+    font-size: 0.68rem;
+  }
+
+  .aisle-gap {
+    width: 14px;
+  }
+
+  .aisle-gap.wide {
+    width: 22px;
+  }
+
+  .seat-btn {
+    width: 36px;
+    height: 38px;
+    font-size: 0.68rem;
+    border-radius: 6px 6px 4px 4px;
+  }
+
+  .seat-btn.seat-first {
+    width: 44px;
+    height: 44px;
+    font-size: 0.72rem;
+  }
+
+  .seat-btn.seat-biz {
+    width: 40px;
+    height: 42px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .airplane-wrapper {
+    padding: 1.8rem 0.35rem;
+  }
+
+  .seat-btn {
+    width: 33px;
+    height: 35px;
+    font-size: 0.62rem;
+  }
+
+  .seat-btn.seat-first {
+    width: 38px;
+    height: 38px;
+  }
+
+  .seat-btn.seat-biz {
+    width: 35px;
+    height: 36px;
+  }
+
+  .aisle-gap {
+    width: 10px;
+  }
+
+  .seat-row {
+    gap: 0.25rem;
+  }
+
+  .row-number {
+    width: 16px;
+    font-size: 0.62rem;
   }
 }
